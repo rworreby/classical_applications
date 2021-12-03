@@ -1,5 +1,5 @@
-import numpy as np 
-import pylab as pyl 
+import numpy as np
+import pylab as pyl
 import scipy.fftpack as sp
 import time
 import sys
@@ -22,12 +22,12 @@ def compute_phi(rho_r, C_, dx, kx = None, fac = 500):
 	return phi_r
 
 def compute_phi2D(rho_r, C_, dx, kx, ky):
-    # TODO: we know rho_r is real, so using rfft would be better 
+    # TODO: we know rho_r is real, so using rfft would be better
     rho_k = sp.fft2(rho_r)
     with np.errstate(divide='ignore', invalid='ignore'):
         # np.errstate(...) suppresses the divide-by-zero warning for k=0
-        phi_k = -(C_*rho_k)/(kx**2+ky**2) 
-    phi_k[0,0] = 0.0 # zero the k=0 component 
+        phi_k = -(C_*rho_k)/(kx**2+ky**2)
+    phi_k[0,0] = 0.0 # zero the k=0 component
     phi_r = np.real(sp.ifft2(phi_k))
     return phi_r
 
@@ -53,7 +53,7 @@ def array_make_periodic(x,w):
     w[x>=1] += 1
     x[x>=1.] -= 1.
 
-    w[x<0] -= 1 
+    w[x<0] -= 1
     x[x<0.]  +=1.
 
 def fast_CIC_deposit(x,mi,Ngrid,periodic=1):
@@ -67,7 +67,7 @@ def fast_CIC_deposit(x,mi,Ngrid,periodic=1):
 
     dx = 1./Ngrid
     rho = np.zeros(Ngrid)
- 
+
     left = x-0.5*dx
     right = left+dx
     xi = np.int32(left/dx)
@@ -81,7 +81,7 @@ def fast_CIC_deposit(x,mi,Ngrid,periodic=1):
     rho2 = pyl.bincount(xir, weights=(1.-frac)*m, minlength=Ngrid)
 
     rho += rho2
-    
+
     return rho*Ngrid
 
 # TODO: wtf is going on here
@@ -91,13 +91,13 @@ def fast_CIC_deposit2D(x,y,mpart,Ngrid,periodic=1):
 
     dx = 1./Ngrid
     rho = np.zeros((Ngrid,Ngrid))
- 
+
     left_x = x-0.5*dx
     left_y = y-0.5*dx
 
     xi = np.int32(left_x/dx)
     yi = np.int32(left_y/dx)
-    
+
     frac_x = (1.+xi-left_x/dx) # fraction in left bin
     frac_y = (1.+yi-left_y/dx)
 
@@ -106,10 +106,10 @@ def fast_CIC_deposit2D(x,y,mpart,Ngrid,periodic=1):
 
     frac_x[ind_x] = (-(left_x[ind_x]/dx))
     frac_y[ind_y] = (-(left_y[ind_y]/dx))
-    
+
     xi[ind_x] = Ngrid-1
     yi[ind_y] = Ngrid-1
-    
+
     xir = xi.copy()+1
     yir = yi.copy()+1
 
@@ -120,7 +120,7 @@ def fast_CIC_deposit2D(x,y,mpart,Ngrid,periodic=1):
     rho[xir,yi] += (1.-frac_x)*frac_y*mpart
     rho[xi,yir] += (1.-frac_y)*frac_x*mpart
     rho[xir,yir] += (1.-frac_x)*(1.-frac_y)*mpart
-    
+
     return rho
 
 # TODO: broken af
@@ -131,12 +131,12 @@ def CIC_deposit2D(rx, ry, mpart, N, periodic = 1):
 	i_left =  (rx - dx/2.)  # index of cell containing left edge
 	i_left[i_left < 0] += 1.
 	i_left = (i_left/dx).astype(np.int32)
-	
+
 	j_left =  (ry - dx/2.)  # index of cell containing left edge
 	j_left[i_left < 0] += 1.
 	j_left = (j_left/dx).astype(np.int32)
 
-	x_frac = 1.5*dx - (rx - (i_left%(N-1)) * dx) # fraction of deposit contianed in left cell 
+	x_frac = 1.5*dx - (rx - (i_left%(N-1)) * dx) # fraction of deposit contianed in left cell
 	y_frac = 1.5*dx - (ry - (j_left%(N-1)) * dx)
 
 	x_frac[x_frac>1.] -= 1
@@ -173,7 +173,7 @@ def a_from_Phi(Phi):
     return a
 
 def central_difference(y):
-    """ Central difference:  (y[i+1]-y[i-1])/2 
+    """ Central difference:  (y[i+1]-y[i-1])/2
     """
     return (np.roll(y,-1)-np.roll(y,1))/2
 
@@ -199,7 +199,7 @@ def getMetaKno(name, **kwargs):
 	f = open("../" + name + "/" + name + "Meta.txt")
 
 	print "reading meta info..."
-	
+
 	metaParams = {}
 
 	for key_ in kwargs.keys():
